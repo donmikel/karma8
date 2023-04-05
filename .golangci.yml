@@ -1,0 +1,99 @@
+linters:
+  enable-all: false
+  enable:
+    - gofmt
+    - govet
+    - staticcheck
+    - revive
+    - gci
+    - gocyclo
+    - nakedret
+    - gochecknoglobals
+    - gochecknoinits
+    - gosimple
+    - goconst
+    - misspell
+    - unconvert
+    - varcheck
+    - unused
+    - deadcode
+    - unparam
+    - ineffassign
+    - prealloc
+    - gosec
+    - godot
+    - bodyclose
+    - rowserrcheck
+    - whitespace
+  disable:
+    - errcheck
+linters-settings:
+  gci:
+    local-prefixes: github.com/donmikel/karma8
+  gofmt:
+    # simplify code: gofmt with `-s` option, true by default
+    simplify: true
+  gocyclo:
+    # Minimal code complexity to report.
+    min-complexity: 36
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+      - shadow
+
+issues:
+  exclude-rules:
+    - path: tools
+      linters:
+        - deadcode
+        - unused
+        - sast
+    - path: _test\.go
+      linters:
+        - gochecknoglobals
+        - funlen
+        - unparam
+        - govet
+        - goconst
+        - prealloc
+        - sast
+    - path: component_test
+      linters:
+        - gochecknoglobals
+        - funlen
+        - unparam
+        - govet
+        - goconst
+        - prealloc
+        - revive
+        - sast
+    - path: main.go
+      linters:
+        - funlen
+        - gochecknoglobals
+    - path: pkg
+      linters:
+        - gochecknoglobals
+  exclude-use-default: false
+  exclude:
+    # govet: Common false positives
+    - (possible misuse of unsafe.Pointer|should have signature)
+
+    # gosec: Too many false-positives on 'unsafe' usage
+    - Use of unsafe calls should be audited
+
+    # gosec: Too many false-positives for parametrized shell calls
+    - Subprocess launch(ed with variable|ing should be audited)
+
+    # gosec: Duplicated errcheck checks
+    - G104
+
+    # gosec: Potential HTTP request made with variable url
+    - G107
+
+    # gosec: Too many issues in popular repos
+    - (Expect directory permissions to be 0750 or less|Expect file permissions to be 0600 or less)
+
+    # gosec: False positive is triggered by 'src, err := ioutil.ReadFile(filename)'
+    - Potential file inclusion via variable
