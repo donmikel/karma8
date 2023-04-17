@@ -1,0 +1,25 @@
+# This image aggregates Docker layers that change infrequently so that they can be cached and re-build only occasionally.
+FROM golang:1.19.2-alpine AS base
+
+ENV GOSUMDB=off \
+    GOPATH=/opt/service/.go
+
+# Include gcc and libc-dev for cgo support
+RUN apk add --no-cache \
+            gcc==11.2.1_git20220219-r2 \
+            libc-dev==0.7.2-r3 \
+            git
+
+WORKDIR /opt/service/
+COPY . .
+
+RUN go build -ldflags="-s -w -linkmode external -extldflags -static" --tags netcgo -o ./bin/server ./applications/server/cmd/
+
+# Copy to fresh image to keep final image small and clean.
+FROM scratch
+USER nobody
+COPY --from=base /etc/passwd /etc/passwd
+COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=base /opt/service/bin /bin
+
+ENTRYPOINT ["/bin/server"]

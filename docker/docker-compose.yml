@@ -1,0 +1,11 @@
+version: '3'
+services:
+  server:
+    container_name: "server"
+    hostname: server
+    ports:
+      - "8002:8002"
+    image: server:latest
+    command: -config "/etc/server/config.yml"
+    volumes:
+      - ./../applications/server/config/config.yml:/etc/server/config.yml
